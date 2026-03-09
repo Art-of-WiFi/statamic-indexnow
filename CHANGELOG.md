@@ -2,6 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## 1.0.1 - 2026-03-09
+
+- Improved filter bar layout with proper select dropdown styling
+- Removed URL column from table to prevent overflow; URL now shown as tooltip on title hover
+- Shortened column headers (Modified, Submitted) for better fit
+
 ## 1.0.0 - 2026-03-09
 
 - Initial release
