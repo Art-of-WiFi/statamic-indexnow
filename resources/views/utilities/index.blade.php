@@ -46,27 +46,21 @@
         </div>
     @else
         {{-- Filters --}}
-        <div class="card p-4 mb-4">
-            <form method="GET" action="{{ cp_route('utilities.index-now') }}" class="flex items-end gap-4">
-                <div>
-                    <label class="text-sm font-medium text-gray-700 mb-1 block">{{ __('Collection') }}</label>
-                    <select name="collection" class="input-text text-sm" onchange="this.form.submit()">
-                        <option value="">{{ __('All collections') }}</option>
-                        @foreach ($collections as $collection)
-                            <option value="{{ $collection }}" @selected($collection_filter === $collection)>
-                                {{ $collection }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="flex-1">
-                    <label class="text-sm font-medium text-gray-700 mb-1 block">{{ __('Search') }}</label>
-                    <input type="text"
-                           name="search"
-                           value="{{ $search_filter }}"
-                           placeholder="{{ __('Search by title...') }}"
-                           class="input-text text-sm w-full" />
-                </div>
+        <div class="card p-4 mb-6">
+            <form method="GET" action="{{ cp_route('utilities.index-now') }}" class="flex items-center gap-4">
+                <select name="collection" class="input-text text-sm" onchange="this.form.submit()">
+                    <option value="">{{ __('All collections') }}</option>
+                    @foreach ($collections as $collection)
+                        <option value="{{ $collection }}" @selected($collection_filter === $collection)>
+                            {{ $collection }}
+                        </option>
+                    @endforeach
+                </select>
+                <input type="text"
+                       name="search"
+                       value="{{ $search_filter }}"
+                       placeholder="{{ __('Search by title...') }}"
+                       class="input-text text-sm flex-1" />
                 <button type="submit" class="btn">{{ __('Filter') }}</button>
                 @if ($collection_filter || $search_filter)
                     <a href="{{ cp_route('utilities.index-now') }}" class="btn text-sm">{{ __('Clear') }}</a>

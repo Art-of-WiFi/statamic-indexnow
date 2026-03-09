@@ -5,3 +5,8 @@
 composer.lock
 /node_modules/
 /vendor/
+
+# Claude Code files
+CLAUDE*.md
+.claude/
+.claude/*
