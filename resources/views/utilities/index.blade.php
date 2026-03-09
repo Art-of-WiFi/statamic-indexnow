@@ -17,7 +17,7 @@
                     <span class="badge-pill-sm bg-green-200 text-green-800">Auto-submit enabled</span>
                 @endif
                 <span class="text-sm text-gray-600">
-                    Submitting to: <strong>{{ $production_url }}</strong>
+                    Submitting for: <strong>{{ $production_url }}</strong>
                 </span>
             </div>
         </div>
