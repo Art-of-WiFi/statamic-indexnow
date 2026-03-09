@@ -1,0 +1,45 @@
+{
+    "name": "artofwifi/statamic-indexnow",
+    "description": "Submit URLs to IndexNow from the Statamic Control Panel for faster search engine indexing.",
+    "keywords": ["statamic", "indexnow", "seo", "bing", "yandex"],
+    "license": "MIT",
+    "type": "statamic-addon",
+    "authors": [
+        {
+            "name": "Art of WiFi",
+            "homepage": "https://artofwifi.net"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "statamic/cms": "^5.0",
+        "laravel/framework": "^11.0 || ^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0 || ^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ArtOfWifi\\StatamicIndexnow\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ArtOfWifi\\StatamicIndexnow\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ArtOfWifi\\StatamicIndexnow\\ServiceProvider"
+            ]
+        },
+        "statamic": {
+            "name": "IndexNow",
+            "description": "Submit URLs to IndexNow for faster search engine indexing."
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
