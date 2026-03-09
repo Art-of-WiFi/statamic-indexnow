@@ -37,11 +37,7 @@ When you submit to any one participating search engine, the submission is automa
 composer require artofwifi/statamic-indexnow
 ```
 
-Run the migration to create the submission tracking table:
-
-```bash
-php artisan migrate
-```
+No database required. Submission history is stored as a JSON file in `storage/statamic-indexnow/`.
 
 ## Setup
 

@@ -3,7 +3,6 @@
 namespace ArtOfWifi\StatamicIndexnow\Tests;
 
 use ArtOfWifi\StatamicIndexnow\ServiceProvider;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Statamic\Extend\Manifest;
 use Statamic\Providers\StatamicServiceProvider;
@@ -11,8 +10,6 @@ use Statamic\Statamic;
 
 abstract class TestCase extends OrchestraTestCase
 {
-    use RefreshDatabase;
-
     protected function getPackageProviders($app): array
     {
         return [
@@ -37,17 +34,6 @@ abstract class TestCase extends OrchestraTestCase
         $app['config']->set('statamic.stache.stores.users', [
             'class' => \Statamic\Stache\Stores\UsersStore::class,
             'directory' => __DIR__ . '/__fixtures__/users',
-        ]);
-    }
-
-    protected function resolveApplicationConfiguration($app): void
-    {
-        parent::resolveApplicationConfiguration($app);
-
-        $app['config']->set('database.default', 'testing');
-        $app['config']->set('database.connections.testing', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
         ]);
     }
 

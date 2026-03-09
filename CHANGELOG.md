@@ -2,6 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## 1.1.0 - 2026-03-09
+
+- **Breaking:** Replaced database storage with flat-file JSON storage — no database or migration required
+- Removed Eloquent model and migration in favor of `SubmissionStore` using `storage/statamic-indexnow/submissions.json`
+- Compatible with flat-file Statamic sites that don't use a database
+
 ## 1.0.1 - 2026-03-09
 
 - Improved filter bar layout with proper select dropdown styling

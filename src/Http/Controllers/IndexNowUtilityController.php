@@ -3,7 +3,8 @@
 namespace ArtOfWifi\StatamicIndexnow\Http\Controllers;
 
 use ArtOfWifi\StatamicIndexnow\IndexNowClient;
-use ArtOfWifi\StatamicIndexnow\Models\IndexNowSubmission;
+use ArtOfWifi\StatamicIndexnow\SubmissionStore;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -18,11 +19,9 @@ class IndexNowUtilityController extends CpController
         $key = config('statamic-indexnow.key');
         $excludeCollections = config('statamic-indexnow.exclude_collections', []);
         $client = app(IndexNowClient::class);
+        $store = app(SubmissionStore::class);
 
-        $lastSubmissions = IndexNowSubmission::query()
-            ->selectRaw('entry_id, MAX(submitted_at) as last_submitted_at')
-            ->groupBy('entry_id')
-            ->pluck('last_submitted_at', 'entry_id');
+        $lastSubmissions = $store->lastSubmittedPerEntry();
 
         $query = Entry::query()->where('published', true);
 
@@ -35,7 +34,7 @@ class IndexNowUtilityController extends CpController
 
                 if ($lastSubmitted === null) {
                     $status = 'never';
-                } elseif ($lastModified && $lastModified->isAfter($lastSubmitted)) {
+                } elseif ($lastModified && $lastModified->isAfter(Carbon::parse($lastSubmitted))) {
                     $status = 'modified';
                 } else {
                     $status = 'submitted';
@@ -49,7 +48,7 @@ class IndexNowUtilityController extends CpController
                     'edit_url' => $entry->editUrl(),
                     'updated_at' => $lastModified?->format('Y-m-d H:i'),
                     'last_submitted' => $lastSubmitted
-                        ? \Carbon\Carbon::parse($lastSubmitted)->format('Y-m-d H:i')
+                        ? Carbon::parse($lastSubmitted)->format('Y-m-d H:i')
                         : null,
                     'status' => $status,
                 ];

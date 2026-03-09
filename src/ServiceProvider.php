@@ -28,12 +28,11 @@ class ServiceProvider extends AddonServiceProvider
         parent::register();
 
         $this->app->singleton(IndexNowClient::class);
+        $this->app->singleton(SubmissionStore::class);
     }
 
     public function bootAddon(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-
         Utility::extend(function () {
             Utility::register('index-now')
                 ->title('IndexNow')

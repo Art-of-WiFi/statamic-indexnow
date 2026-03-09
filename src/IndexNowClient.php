@@ -2,7 +2,6 @@
 
 namespace ArtOfWifi\StatamicIndexnow;
 
-use ArtOfWifi\StatamicIndexnow\Models\IndexNowSubmission;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -24,6 +23,7 @@ class IndexNowClient
         $host = parse_url($productionUrl, PHP_URL_HOST);
         $chunks = array_chunk($urlEntries, $batchSize);
         $batchId = Str::uuid()->toString();
+        $store = app(SubmissionStore::class);
 
         $submitted = 0;
         $failed = 0;
@@ -41,15 +41,7 @@ class IndexNowClient
 
             $statusCode = $response->status();
 
-            foreach ($chunk as $entry) {
-                IndexNowSubmission::create([
-                    'entry_id' => $entry['entry_id'],
-                    'url' => $entry['url'],
-                    'batch_id' => $batchId,
-                    'status_code' => $statusCode,
-                    'submitted_at' => now(),
-                ]);
-            }
+            $store->record($chunk, $statusCode, $batchId);
 
             if ($response->successful()) {
                 $submitted += count($chunk);

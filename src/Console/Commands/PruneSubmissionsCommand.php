@@ -2,7 +2,7 @@
 
 namespace ArtOfWifi\StatamicIndexnow\Console\Commands;
 
-use ArtOfWifi\StatamicIndexnow\Models\IndexNowSubmission;
+use ArtOfWifi\StatamicIndexnow\SubmissionStore;
 use Illuminate\Console\Command;
 
 class PruneSubmissionsCommand extends Command
@@ -14,10 +14,9 @@ class PruneSubmissionsCommand extends Command
     public function handle(): int
     {
         $days = (int) $this->option('days');
+        $store = app(SubmissionStore::class);
 
-        $deleted = IndexNowSubmission::query()
-            ->where('submitted_at', '<', now()->subDays($days))
-            ->delete();
+        $deleted = $store->prune($days);
 
         $this->info("Deleted {$deleted} submission record(s) older than {$days} days.");
 

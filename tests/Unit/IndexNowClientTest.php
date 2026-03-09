@@ -3,7 +3,7 @@
 namespace ArtOfWifi\StatamicIndexnow\Tests\Unit;
 
 use ArtOfWifi\StatamicIndexnow\IndexNowClient;
-use ArtOfWifi\StatamicIndexnow\Models\IndexNowSubmission;
+use ArtOfWifi\StatamicIndexnow\SubmissionStore;
 use ArtOfWifi\StatamicIndexnow\Tests\TestCase;
 use Illuminate\Support\Facades\Http;
 
@@ -29,7 +29,7 @@ class IndexNowClientTest extends TestCase
         Http::assertSentCount(1);
     }
 
-    public function test_submit_records_submissions_in_database(): void
+    public function test_submit_records_submissions_in_store(): void
     {
         Http::fake([
             'api.indexnow.org/*' => Http::response('', 200),
@@ -41,12 +41,12 @@ class IndexNowClientTest extends TestCase
             ['entry_id' => 'entry-1', 'url' => 'https://example.com/page-one'],
         ]);
 
-        $this->assertDatabaseCount('indexnow_submissions', 1);
-        $this->assertDatabaseHas('indexnow_submissions', [
-            'entry_id' => 'entry-1',
-            'url' => 'https://example.com/page-one',
-            'status_code' => 200,
-        ]);
+        $store = app(SubmissionStore::class);
+        $all = $store->all();
+
+        $this->assertCount(1, $all);
+        $this->assertSame('entry-1', $all->first()['entry_id']);
+        $this->assertSame(200, $all->first()['status_code']);
     }
 
     public function test_submit_handles_api_failure(): void
@@ -98,7 +98,9 @@ class IndexNowClientTest extends TestCase
         $result = $client->submitSingle('entry-1', 'https://example.com/page-one');
 
         $this->assertSame(1, $result['submitted']);
-        $this->assertDatabaseCount('indexnow_submissions', 1);
+
+        $store = app(SubmissionStore::class);
+        $this->assertCount(1, $store->all());
     }
 
     public function test_build_production_url_with_uri(): void
