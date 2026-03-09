@@ -25,7 +25,11 @@ php artisan migrate
 
 ### 1. Generate an IndexNow key
 
-Create a key (8-128 characters, alphanumeric with optional hyphens). You can generate one at [indexnow.org/genkey](https://www.indexnow.org/genkey).
+Create a key (8-128 characters, alphanumeric with optional hyphens). You can generate one at [indexnow.org/genkey](https://www.indexnow.org/genkey) or use OpenSSL:
+
+```bash
+openssl rand -hex 32
+```
 
 ### 2. Add the key to your `.env`
 
