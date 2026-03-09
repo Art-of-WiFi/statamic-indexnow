@@ -88,15 +88,15 @@
                             <th class="cursor-pointer select-none" data-sort="collection">
                                 {{ __('Collection') }} <span class="sort-arrow text-gray-400"></span>
                             </th>
-                            <th>{{ __('URL') }}</th>
-                            <th class="cursor-pointer select-none" data-sort="status">
+                            <th class="max-w-xs">{{ __('URL') }}</th>
+                            <th class="cursor-pointer select-none whitespace-nowrap" data-sort="status">
                                 {{ __('Status') }} <span class="sort-arrow text-gray-400"></span>
                             </th>
-                            <th class="cursor-pointer select-none" data-sort="updated_at">
-                                {{ __('Last Modified') }} <span class="sort-arrow text-gray-400">&#9660;</span>
+                            <th class="cursor-pointer select-none whitespace-nowrap" data-sort="updated_at">
+                                {{ __('Modified') }} <span class="sort-arrow text-gray-400">&#9660;</span>
                             </th>
-                            <th class="cursor-pointer select-none" data-sort="last_submitted">
-                                {{ __('Last Submitted') }} <span class="sort-arrow text-gray-400"></span>
+                            <th class="cursor-pointer select-none whitespace-nowrap" data-sort="last_submitted">
+                                {{ __('Submitted') }} <span class="sort-arrow text-gray-400"></span>
                             </th>
                         </tr>
                     </thead>
@@ -121,7 +121,7 @@
                                 <td>
                                     <span class="badge-pill-sm">{{ $entry['collection'] }}</span>
                                 </td>
-                                <td class="text-xs text-gray-600 font-mono">
+                                <td class="text-xs text-gray-600 font-mono max-w-xs break-all">
                                     {{ $entry['url'] }}
                                 </td>
                                 <td>
