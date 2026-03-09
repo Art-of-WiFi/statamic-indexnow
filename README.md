@@ -1,24 +1,13 @@
 # IndexNow for Statamic
 
-A Statamic addon that lets you submit URLs to [IndexNow](https://www.indexnow.org/) directly from the Control Panel for faster indexing by Bing, Yandex, Seznam, Naver, and other participating search engines.
+Submit URLs to [IndexNow](https://www.indexnow.org/) directly from your Statamic Control Panel. All participating search engines are notified instantly:
 
-## Features
+- Bing
+- Yandex
+- Seznam
+- Naver
 
-- **CP Utility** — Browse all published entries and submit selected URLs to IndexNow with one click
-- **Submission tracking** — See which entries have been submitted, when, and whether they've been modified since
-- **Bulk actions** — Select all unsubmitted or modified entries with one click
-- **Auto-submit on publish** — Optionally submit URLs automatically when entries are saved (configurable)
-- **Collection filtering** — Filter and search entries by collection and title
-- **Sortable columns** — Sort by title, collection, status, last modified, or last submitted
-- **Exclude collections** — Hide specific collections from the utility and auto-submission
-- **Batch support** — Large submissions are automatically chunked (IndexNow allows max 10,000 URLs per request)
-- **History cleanup** — Artisan command to prune old submission records
-
-## Requirements
-
-- PHP 8.2+
-- Statamic 5
-- Laravel 11 or 12
+> **Note:** Google does not participate in IndexNow. Use [Google Search Console](https://search.google.com/search-console) for Google indexing.
 
 ## Installation
 
@@ -26,79 +15,111 @@ A Statamic addon that lets you submit URLs to [IndexNow](https://www.indexnow.or
 composer require artofwifi/statamic-indexnow
 ```
 
-Run the migration:
+Run the migration to create the submission tracking table:
 
 ```bash
 php artisan migrate
 ```
 
+## Setup
+
+### 1. Generate an IndexNow key
+
+Create a key (8-128 characters, alphanumeric with optional hyphens). You can generate one at [indexnow.org/genkey](https://www.indexnow.org/genkey).
+
+### 2. Add the key to your `.env`
+
+```env
+INDEXNOW_KEY=your-key-here
+```
+
+### 3. Host the key file
+
+Create a text file named `{your-key}.txt` containing just the key, and place it at the root of your domain:
+
+```
+https://yourdomain.com/your-key-here.txt
+```
+
+That's it! Head to **CP > Utilities > IndexNow** and start submitting.
+
 ## Configuration
 
-Publish the config file:
+Publish the config file if you need to customize settings:
 
 ```bash
 php artisan vendor:publish --tag=statamic-indexnow-config
 ```
 
-### Environment Variables
+This will create `config/statamic-indexnow.php` with the following options:
 
-Add these to your `.env` file:
+```php
+return [
+    // Your IndexNow API key
+    'key' => env('INDEXNOW_KEY'),
 
-```env
-INDEXNOW_KEY=your-indexnow-key-here
+    // IndexNow endpoint (any participating engine shares with all others)
+    'endpoint' => env('INDEXNOW_ENDPOINT', 'https://api.indexnow.org/indexnow'),
+
+    // Base URL for submitted entries (useful when submitting from a dev environment)
+    'production_url' => env('INDEXNOW_PRODUCTION_URL', env('APP_URL')),
+
+    // Automatically submit URLs when entries are published or updated
+    'auto_submit' => env('INDEXNOW_AUTO_SUBMIT', false),
+
+    // Collection handles to exclude from the utility and auto-submission
+    'exclude_collections' => [],
+
+    // Max URLs per API request (IndexNow protocol limit is 10,000)
+    'batch_size' => 10000,
+];
 ```
-
-Optional:
-
-```env
-INDEXNOW_PRODUCTION_URL=https://yourdomain.com
-INDEXNOW_AUTO_SUBMIT=false
-INDEXNOW_ENDPOINT=https://api.indexnow.org/indexnow
-```
-
-### Setting Up Your IndexNow Key
-
-1. Generate a key (8-128 alphanumeric characters with optional hyphens)
-2. Add it to your `.env` as `INDEXNOW_KEY`
-3. Create a text file named `{your-key}.txt` containing just the key
-4. Host this file at the root of your domain: `https://yourdomain.com/{your-key}.txt`
 
 ### Production URL
 
-If you manage your site from a development environment, set `INDEXNOW_PRODUCTION_URL` to your production domain. This ensures production URLs are submitted regardless of which environment you're using the CP from.
+If you manage your site from a development or staging environment, set `INDEXNOW_PRODUCTION_URL` to ensure the correct URLs are submitted:
 
-### Config Options
+```env
+INDEXNOW_PRODUCTION_URL=https://yourdomain.com
+```
 
-| Option | Default | Description |
-|---|---|---|
-| `key` | `null` | Your IndexNow API key |
-| `endpoint` | `https://api.indexnow.org/indexnow` | IndexNow API endpoint |
-| `production_url` | `APP_URL` | Base URL for submitted entries |
-| `auto_submit` | `false` | Auto-submit when entries are saved |
-| `exclude_collections` | `[]` | Collection handles to exclude |
-| `batch_size` | `10000` | Max URLs per API request |
+### Excluding collections
+
+Add collection handles to `exclude_collections` to hide them from the utility and skip them during auto-submission:
+
+```php
+'exclude_collections' => ['internal', 'drafts'],
+```
 
 ## Usage
 
 ### CP Utility
 
-Navigate to **Utilities > IndexNow** in the Statamic Control Panel. You'll see a table of all published entries with their submission status:
+Navigate to **Utilities > IndexNow** in the Control Panel. You'll see all published entries with their submission status:
 
-- **Never** (gray) — Entry has never been submitted
-- **Modified** (amber) — Entry was modified after the last submission
-- **Submitted** (green) — Entry hasn't changed since last submission
+| Status | Meaning |
+|---|---|
+| **Never** (gray) | Entry has never been submitted |
+| **Modified** (amber) | Entry was modified after the last submission |
+| **Submitted** (green) | Entry hasn't changed since last submission |
 
-Select entries and click **Submit Selected to IndexNow**.
+Select entries and click **Submit Selected to IndexNow**. Use the quick-select buttons to select all unsubmitted or modified entries.
 
-Use the **Select unsubmitted** and **Select modified** buttons for quick bulk selection.
+The table supports sorting by title, collection, status, last modified, and last submitted date. Filter by collection or search by title using the controls above the table.
 
-### Auto-Submit
+### Auto-submit on publish
 
-Set `INDEXNOW_AUTO_SUBMIT=true` in your `.env` to automatically submit URLs when entries are published or updated. Entries in excluded collections are skipped.
+Enable automatic submission whenever entries are saved:
 
-### Pruning Old Records
+```env
+INDEXNOW_AUTO_SUBMIT=true
+```
 
-Clean up old submission records:
+When enabled, each published entry triggers a submission to IndexNow. Entries in excluded collections and unpublished entries are skipped.
+
+### Cleaning up old records
+
+Submission history accumulates over time. Use the artisan command to prune old records:
 
 ```bash
 # Delete records older than 90 days (default)
@@ -108,19 +129,11 @@ php artisan indexnow:prune
 php artisan indexnow:prune --days=30
 ```
 
-You can schedule this in your `app/Console/Kernel.php`:
+To run this automatically, add it to your schedule in `routes/console.php` or `app/Console/Kernel.php`:
 
 ```php
 $schedule->command('indexnow:prune')->monthly();
 ```
-
-## About IndexNow
-
-IndexNow is an open protocol that allows websites to notify search engines about URL changes instantly. When you submit to one participating engine, all others are notified automatically.
-
-**Participating search engines:** Bing, Yandex, Seznam, Naver
-
-**Note:** Google does not participate in IndexNow. Use Google Search Console for Google indexing.
 
 ## License
 
