@@ -2,6 +2,7 @@
     "name": "artofwifi/statamic-indexnow",
     "description": "Submit URLs to IndexNow from the Statamic Control Panel for faster search engine indexing.",
     "keywords": ["statamic", "indexnow", "seo", "bing", "yandex", "search"],
+    "version": "1.0.0",
     "license": "MIT",
     "type": "statamic-addon",
     "authors": [

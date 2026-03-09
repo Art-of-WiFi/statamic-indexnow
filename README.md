@@ -1,13 +1,35 @@
 # IndexNow for Statamic
 
-Submit URLs to [IndexNow](https://www.indexnow.org/) directly from your Statamic Control Panel. All participating search engines are notified instantly:
+Submit URLs to [IndexNow](https://www.indexnow.org/) directly from your Statamic Control Panel for faster search engine indexing.
 
-- Bing
-- Yandex
-- Seznam
-- Naver
+## What is IndexNow?
+
+[IndexNow](https://www.indexnow.org/) is an open protocol that allows websites to instantly notify search engines about content changes. Instead of waiting for search engines to discover updates through crawling, IndexNow enables real-time notifications resulting in faster indexing and more current search results.
+
+When you submit to any one participating search engine, the submission is automatically shared with all others:
+
+- **Bing**
+- **Yandex**
+- **Seznam**
+- **Naver**
 
 > **Note:** Google does not participate in IndexNow. Use [Google Search Console](https://search.google.com/search-console) for Google indexing.
+
+## Features
+
+- **CP Utility** — browse all published entries and submit selected URLs with one click
+- **Submission tracking** — see which entries have been submitted and whether they've been modified since
+- **Auto-submit on publish** — optionally submit URLs automatically when entries are saved
+- **Bulk actions** — quickly select all unsubmitted or modified entries
+- **Collection filtering** — filter entries by collection and search by title
+- **Sortable columns** — sort by title, collection, status, last modified, or last submitted
+- **Batch support** — large submissions are automatically chunked per IndexNow's 10,000 URL limit
+- **History cleanup** — artisan command to prune old submission records
+
+## Requirements
+
+- Statamic 5
+- Laravel 11 or 12
 
 ## Installation
 
@@ -25,7 +47,7 @@ php artisan migrate
 
 ### 1. Generate an IndexNow key
 
-Create a key (8-128 characters, alphanumeric with optional hyphens). You can generate one at [indexnow.org/genkey](https://www.indexnow.org/genkey) or use OpenSSL:
+Your API key must be 8-128 characters long, using alphanumeric characters and hyphens. You can generate one at [indexnow.org/genkey](https://www.indexnow.org/genkey) or use OpenSSL:
 
 ```bash
 openssl rand -hex 32
@@ -37,13 +59,15 @@ openssl rand -hex 32
 INDEXNOW_KEY=your-key-here
 ```
 
-### 3. Host the key file
+### 3. Host the verification key file
 
-Create a text file named `{your-key}.txt` containing just the key, and place it at the root of your domain:
+IndexNow requires a verification file at your domain root to prove ownership. Create a text file named `{your-key}.txt` containing just the key:
 
 ```
 https://yourdomain.com/your-key-here.txt
 ```
+
+The file must be publicly accessible and return only the key as plain text.
 
 That's it! Head to **CP > Utilities > IndexNow** and start submitting.
 
@@ -81,7 +105,7 @@ return [
 
 ### Production URL
 
-If you manage your site from a development or staging environment, set `INDEXNOW_PRODUCTION_URL` to ensure the correct URLs are submitted:
+If you manage your site from a development or staging environment, set `INDEXNOW_PRODUCTION_URL` to ensure production URLs are submitted regardless of which environment the CP runs in:
 
 ```env
 INDEXNOW_PRODUCTION_URL=https://yourdomain.com
@@ -103,7 +127,7 @@ Navigate to **Utilities > IndexNow** in the Control Panel. You'll see all publis
 
 | Status | Meaning |
 |---|---|
-| **Never** (gray) | Entry has never been submitted |
+| **Never** (gray) | Entry has never been submitted to IndexNow |
 | **Modified** (amber) | Entry was modified after the last submission |
 | **Submitted** (green) | Entry hasn't changed since last submission |
 
