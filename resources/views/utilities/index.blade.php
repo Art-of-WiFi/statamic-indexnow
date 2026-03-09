@@ -88,7 +88,6 @@
                             <th class="cursor-pointer select-none" data-sort="collection">
                                 {{ __('Collection') }} <span class="sort-arrow text-gray-400"></span>
                             </th>
-                            <th class="max-w-xs">{{ __('URL') }}</th>
                             <th class="cursor-pointer select-none whitespace-nowrap" data-sort="status">
                                 {{ __('Status') }} <span class="sort-arrow text-gray-400"></span>
                             </th>
@@ -114,15 +113,12 @@
                                            data-entry-id="{{ $entry['id'] }}" />
                                 </td>
                                 <td>
-                                    <a href="{{ $entry['edit_url'] }}" class="text-blue-600 hover:text-blue-800">
+                                    <a href="{{ $entry['edit_url'] }}" class="text-blue-600 hover:text-blue-800" title="{{ $entry['url'] }}">
                                         {{ $entry['title'] }}
                                     </a>
                                 </td>
                                 <td>
                                     <span class="badge-pill-sm">{{ $entry['collection'] }}</span>
-                                </td>
-                                <td class="text-xs text-gray-600 font-mono max-w-xs break-all">
-                                    {{ $entry['url'] }}
                                 </td>
                                 <td>
                                     @if ($entry['status'] === 'never')
