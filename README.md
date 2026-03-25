@@ -28,8 +28,8 @@ When you submit to any one participating search engine, the submission is automa
 
 ## Requirements
 
-- Statamic 5
-- Laravel 11 or 12
+- Statamic 5 or 6
+- Laravel 11, 12, or 13
 
 ## Installation
 
