@@ -2,6 +2,11 @@
 
 All notable changes to this package will be documented in this file.
 
+## 1.2.0 - 2026-03-25
+
+- Added Statamic 6 compatibility (now supports `^5.0 || ^6.0`)
+- Changed breadcrumb partial to `@includeIf` for forward compatibility with Statamic 6 (breadcrumbs are auto-generated)
+
 ## 1.1.0 - 2026-03-09
 
 - **Breaking:** Replaced database storage with flat-file JSON storage — no database or migration required

@@ -6,7 +6,7 @@
 @section('content')
 
     <header class="mb-6">
-        @include('statamic::partials.breadcrumb', [
+        @includeIf('statamic::partials.breadcrumb', [
             'url' => cp_route('utilities.index'),
             'title' => __('Utilities')
         ])
