@@ -65,9 +65,9 @@
                            placeholder="{{ __('Search by title...') }}"
                            class="input-text text-sm w-full" />
                 </div>
-                <button type="submit" class="relative inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium cursor-pointer bg-linear-to-b from-white to-gray-50 hover:to-gray-100 text-gray-900 border border-gray-300 shadow-sm px-3 h-8 text-[0.8125rem] rounded-lg">{{ __('Filter') }}</button>
+                <button type="submit" style="display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;font-weight:500;font-size:0.8125rem;cursor:pointer;border-radius:0.5rem;padding:0 0.75rem;height:2rem;text-decoration:none;background:linear-gradient(to bottom,#fff,#f9fafb);color:#111827;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,0.05)">{{ __('Filter') }}</button>
                 @if ($collection_filter || $search_filter)
-                    <a href="{{ cp_route('utilities.index-now') }}" class="relative inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium cursor-pointer no-underline bg-linear-to-b from-white to-gray-50 hover:to-gray-100 text-gray-900 border border-gray-300 shadow-sm px-3 h-8 text-[0.8125rem] rounded-lg">{{ __('Clear') }}</a>
+                    <a href="{{ cp_route('utilities.index-now') }}" style="display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;font-weight:500;font-size:0.8125rem;cursor:pointer;border-radius:0.5rem;padding:0 0.75rem;height:2rem;text-decoration:none;background:linear-gradient(to bottom,#fff,#f9fafb);color:#111827;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,0.05)">{{ __('Clear') }}</a>
                 @endif
             </form>
         </div>
@@ -145,16 +145,16 @@
             <div id="hidden-inputs"></div>
 
             <div class="mt-4 flex items-center gap-4">
-                <button type="submit" class="relative inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium cursor-pointer bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white disabled:opacity-60 disabled:cursor-not-allowed border border-primary-border shadow-md px-4 h-10 text-sm rounded-lg" id="submit-btn" disabled>
+                <button type="submit" style="display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;font-weight:500;font-size:0.875rem;cursor:pointer;border-radius:0.5rem;padding:0 1rem;height:2.5rem;text-decoration:none;background:linear-gradient(to bottom,rgba(59,130,246,0.9),rgb(59,130,246));color:#fff;border:1px solid rgba(37,99,235,0.8);box-shadow:0 1px 3px rgba(0,0,0,0.15),inset 0 1px 0 rgba(255,255,255,0.25)" id="submit-btn" disabled>
                     {{ __('Submit Selected to IndexNow') }}
                 </button>
                 <span class="text-sm text-gray-600" id="selected-count">0 selected</span>
 
                 <div class="ml-auto flex items-center gap-2">
-                    <button type="button" class="relative inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium cursor-pointer bg-linear-to-b from-white to-gray-50 hover:to-gray-100 text-gray-900 border border-gray-300 shadow-sm px-3 h-8 text-[0.8125rem] rounded-lg" id="select-unsubmitted">
+                    <button type="button" style="display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;font-weight:500;font-size:0.8125rem;cursor:pointer;border-radius:0.5rem;padding:0 0.75rem;height:2rem;text-decoration:none;background:linear-gradient(to bottom,#fff,#f9fafb);color:#111827;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,0.05)" id="select-unsubmitted">
                         {{ __('Select unsubmitted') }}
                     </button>
-                    <button type="button" class="relative inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium cursor-pointer bg-linear-to-b from-white to-gray-50 hover:to-gray-100 text-gray-900 border border-gray-300 shadow-sm px-3 h-8 text-[0.8125rem] rounded-lg" id="select-modified">
+                    <button type="button" style="display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;font-weight:500;font-size:0.8125rem;cursor:pointer;border-radius:0.5rem;padding:0 0.75rem;height:2rem;text-decoration:none;background:linear-gradient(to bottom,#fff,#f9fafb);color:#111827;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,0.05)" id="select-modified">
                         {{ __('Select modified') }}
                     </button>
                 </div>
