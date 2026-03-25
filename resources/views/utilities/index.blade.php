@@ -65,9 +65,9 @@
                            placeholder="{{ __('Search by title...') }}"
                            class="input-text text-sm w-full" />
                 </div>
-                <Button type="submit" size="sm" text="{{ __('Filter') }}" />
+                <ui-button type="submit" size="sm" text="{{ __('Filter') }}" />
                 @if ($collection_filter || $search_filter)
-                    <Button size="sm" text="{{ __('Clear') }}" href="{{ cp_route('utilities.index-now') }}" />
+                    <ui-button size="sm" text="{{ __('Clear') }}" href="{{ cp_route('utilities.index-now') }}" />
                 @endif
             </form>
         </div>
@@ -145,12 +145,12 @@
             <div id="hidden-inputs"></div>
 
             <div class="mt-4 flex items-center gap-4">
-                <Button type="submit" variant="primary" text="{{ __('Submit Selected to IndexNow') }}" id="submit-btn" :disabled="true" />
+                <ui-button type="submit" variant="primary" text="{{ __('Submit Selected to IndexNow') }}" id="submit-btn" :disabled="true" />
                 <span class="text-sm text-gray-600" id="selected-count">0 selected</span>
 
                 <div class="ml-auto flex items-center gap-2">
-                    <Button size="sm" text="{{ __('Select unsubmitted') }}" id="select-unsubmitted" />
-                    <Button size="sm" text="{{ __('Select modified') }}" id="select-modified" />
+                    <ui-button size="sm" text="{{ __('Select unsubmitted') }}" id="select-unsubmitted" />
+                    <ui-button size="sm" text="{{ __('Select modified') }}" id="select-modified" />
                 </div>
             </div>
         </form>
