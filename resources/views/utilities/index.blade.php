@@ -154,118 +154,166 @@
                 </div>
             </div>
         </form>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var selectAll = document.getElementById('select-all');
-                var submitBtn = document.getElementById('submit-btn');
-                var countLabel = document.getElementById('selected-count');
-                var hiddenInputs = document.getElementById('hidden-inputs');
-                var tbody = document.querySelector('#indexnow-table tbody');
-                var headers = document.querySelectorAll('th[data-sort]');
-                var form = document.getElementById('indexnow-form');
-
-                var currentSort = 'updated_at';
-                var currentDir = 'desc';
-
-                function getCheckboxes() {
-                    return document.querySelectorAll('.url-checkbox');
-                }
-
-                function updateState() {
-                    var checkboxes = getCheckboxes();
-                    var checked = document.querySelectorAll('.url-checkbox:checked');
-                    submitBtn.disabled = checked.length === 0;
-                    countLabel.textContent = checked.length + ' selected';
-                    selectAll.checked = checked.length === checkboxes.length && checkboxes.length > 0;
-                    selectAll.indeterminate = checked.length > 0 && checked.length < checkboxes.length;
-
-                    // Update hidden inputs
-                    hiddenInputs.innerHTML = '';
-                    checked.forEach(function (cb, i) {
-                        var urlInput = document.createElement('input');
-                        urlInput.type = 'hidden';
-                        urlInput.name = 'urls[' + i + '][url]';
-                        urlInput.value = cb.dataset.url;
-                        hiddenInputs.appendChild(urlInput);
-
-                        var idInput = document.createElement('input');
-                        idInput.type = 'hidden';
-                        idInput.name = 'urls[' + i + '][entry_id]';
-                        idInput.value = cb.dataset.entryId;
-                        hiddenInputs.appendChild(idInput);
-                    });
-                }
-
-                function sortTable(column, direction) {
-                    var rows = Array.from(tbody.querySelectorAll('tr'));
-
-                    rows.sort(function (a, b) {
-                        var aVal = (a.dataset[column] || '').toLowerCase();
-                        var bVal = (b.dataset[column] || '').toLowerCase();
-
-                        if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-                        if (aVal > bVal) return direction === 'asc' ? 1 : -1;
-                        return 0;
-                    });
-
-                    rows.forEach(function (row) { tbody.appendChild(row); });
-
-                    headers.forEach(function (th) {
-                        var arrow = th.querySelector('.sort-arrow');
-                        if (th.dataset.sort === column) {
-                            arrow.innerHTML = direction === 'asc' ? '&#9650;' : '&#9660;';
-                            arrow.classList.remove('text-gray-400');
-                            arrow.classList.add('text-gray-700');
-                        } else {
-                            arrow.innerHTML = '';
-                            arrow.classList.remove('text-gray-700');
-                            arrow.classList.add('text-gray-400');
-                        }
-                    });
-                }
-
-                headers.forEach(function (th) {
-                    th.addEventListener('click', function () {
-                        var column = th.dataset.sort;
-
-                        if (currentSort === column) {
-                            currentDir = currentDir === 'asc' ? 'desc' : 'asc';
-                        } else {
-                            currentSort = column;
-                            currentDir = column === 'updated_at' || column === 'last_submitted' ? 'desc' : 'asc';
-                        }
-
-                        sortTable(currentSort, currentDir);
-                    });
-                });
-
-                selectAll.addEventListener('change', function () {
-                    getCheckboxes().forEach(function (cb) { cb.checked = selectAll.checked; });
-                    updateState();
-                });
-
-                tbody.addEventListener('change', function (e) {
-                    if (e.target.classList.contains('url-checkbox')) {
-                        updateState();
-                    }
-                });
-
-                document.getElementById('select-unsubmitted').addEventListener('click', function () {
-                    getCheckboxes().forEach(function (cb) {
-                        cb.checked = cb.closest('tr').dataset.status === 'never';
-                    });
-                    updateState();
-                });
-
-                document.getElementById('select-modified').addEventListener('click', function () {
-                    getCheckboxes().forEach(function (cb) {
-                        cb.checked = cb.closest('tr').dataset.status === 'modified';
-                    });
-                    updateState();
-                });
-            });
-        </script>
     @endif
 
+@endsection
+
+@section('scripts')
+    {{--
+        Kept outside of the content section: on Statamic 6 the content is compiled as a Vue
+        template, which strips <script> tags and replaces the server-rendered DOM on mount.
+        Listeners are therefore delegated to the document and elements are looked up lazily.
+    --}}
+    <script>
+        (function () {
+            var currentSort = 'updated_at';
+            var currentDir = 'desc';
+
+            function getCheckboxes() {
+                return document.querySelectorAll('.url-checkbox');
+            }
+
+            function getCheckedCheckboxes() {
+                return document.querySelectorAll('.url-checkbox:checked');
+            }
+
+            function getSubmitButton() {
+                var submitBtn = document.getElementById('submit-btn');
+
+                if (submitBtn && submitBtn.tagName !== 'BUTTON') {
+                    submitBtn = submitBtn.querySelector('button') || submitBtn;
+                }
+
+                return submitBtn;
+            }
+
+            function updateState() {
+                var checkboxes = getCheckboxes();
+                var checked = getCheckedCheckboxes();
+                var selectAll = document.getElementById('select-all');
+                var submitBtn = getSubmitButton();
+                var countLabel = document.getElementById('selected-count');
+
+                if (submitBtn) {
+                    submitBtn.disabled = checked.length === 0;
+                }
+
+                if (countLabel) {
+                    countLabel.textContent = checked.length + ' selected';
+                }
+
+                if (selectAll) {
+                    selectAll.checked = checked.length === checkboxes.length && checkboxes.length > 0;
+                    selectAll.indeterminate = checked.length > 0 && checked.length < checkboxes.length;
+                }
+            }
+
+            function fillHiddenInputs(form) {
+                var hiddenInputs = form.querySelector('#hidden-inputs');
+
+                hiddenInputs.innerHTML = '';
+
+                getCheckedCheckboxes().forEach(function (cb, i) {
+                    var urlInput = document.createElement('input');
+                    urlInput.type = 'hidden';
+                    urlInput.name = 'urls[' + i + '][url]';
+                    urlInput.value = cb.dataset.url;
+                    hiddenInputs.appendChild(urlInput);
+
+                    var idInput = document.createElement('input');
+                    idInput.type = 'hidden';
+                    idInput.name = 'urls[' + i + '][entry_id]';
+                    idInput.value = cb.dataset.entryId;
+                    hiddenInputs.appendChild(idInput);
+                });
+            }
+
+            function sortTable(column, direction) {
+                var tbody = document.querySelector('#indexnow-table tbody');
+                var rows = Array.from(tbody.querySelectorAll('tr'));
+
+                rows.sort(function (a, b) {
+                    var aVal = (a.dataset[column] || '').toLowerCase();
+                    var bVal = (b.dataset[column] || '').toLowerCase();
+
+                    if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+                    if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                rows.forEach(function (row) { tbody.appendChild(row); });
+
+                document.querySelectorAll('#indexnow-table th[data-sort]').forEach(function (th) {
+                    var arrow = th.querySelector('.sort-arrow');
+                    if (th.dataset.sort === column) {
+                        arrow.innerHTML = direction === 'asc' ? '&#9650;' : '&#9660;';
+                        arrow.classList.remove('text-gray-400');
+                        arrow.classList.add('text-gray-700');
+                    } else {
+                        arrow.innerHTML = '';
+                        arrow.classList.remove('text-gray-700');
+                        arrow.classList.add('text-gray-400');
+                    }
+                });
+            }
+
+            function selectByStatus(status) {
+                getCheckboxes().forEach(function (cb) {
+                    cb.checked = cb.closest('tr').dataset.status === status;
+                });
+                updateState();
+            }
+
+            document.addEventListener('change', function (e) {
+                if (e.target.id === 'select-all') {
+                    getCheckboxes().forEach(function (cb) { cb.checked = e.target.checked; });
+                    updateState();
+                } else if (e.target.classList.contains('url-checkbox')) {
+                    updateState();
+                }
+            });
+
+            document.addEventListener('click', function (e) {
+                var target = e.target instanceof Element ? e.target : null;
+
+                if (! target) {
+                    return;
+                }
+
+                var th = target.closest('#indexnow-table th[data-sort]');
+
+                if (th) {
+                    var column = th.dataset.sort;
+
+                    if (currentSort === column) {
+                        currentDir = currentDir === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort = column;
+                        currentDir = column === 'updated_at' || column === 'last_submitted' ? 'desc' : 'asc';
+                    }
+
+                    sortTable(currentSort, currentDir);
+                } else if (target.closest('#select-unsubmitted')) {
+                    e.preventDefault();
+                    selectByStatus('never');
+                } else if (target.closest('#select-modified')) {
+                    e.preventDefault();
+                    selectByStatus('modified');
+                }
+            });
+
+            document.addEventListener('submit', function (e) {
+                if (e.target.id !== 'indexnow-form') {
+                    return;
+                }
+
+                if (getCheckedCheckboxes().length === 0) {
+                    e.preventDefault();
+                    return;
+                }
+
+                fillHiddenInputs(e.target);
+            });
+        })();
+    </script>
 @endsection
