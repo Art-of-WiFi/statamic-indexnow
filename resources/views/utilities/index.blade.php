@@ -75,6 +75,11 @@
         <form method="POST" action="{{ cp_route('utilities.index-now.submit') }}" id="indexnow-form">
             @csrf
 
+            <div class="mb-4 flex items-center justify-end gap-2">
+                <ui-button size="sm" text="{{ __('Select unsubmitted') }}" id="select-unsubmitted" />
+                <ui-button size="sm" text="{{ __('Select modified') }}" id="select-modified" />
+            </div>
+
             <div class="card p-0">
                 <table class="data-table" id="indexnow-table">
                     <thead>
@@ -144,13 +149,14 @@
             {{-- Hidden inputs container for selected URLs --}}
             <div id="hidden-inputs"></div>
 
-            <div class="mt-4 flex items-center gap-4">
-                <ui-button type="submit" variant="primary" text="{{ __('Submit Selected to IndexNow') }}" id="submit-btn" :disabled="true" />
-                <span class="text-sm text-gray-600" id="selected-count">0 selected</span>
-
-                <div class="ml-auto flex items-center gap-2">
-                    <ui-button size="sm" text="{{ __('Select unsubmitted') }}" id="select-unsubmitted" />
-                    <ui-button size="sm" text="{{ __('Select modified') }}" id="select-modified" />
+            {{-- Floating toolbar, shown while entries are selected (mirrors the CP listing bulk actions) --}}
+            <div class="indexnow-toolbar" id="indexnow-toolbar" hidden>
+                <div class="indexnow-toolbar-inner">
+                    <span class="indexnow-toolbar-count" id="selected-count">0 selected</span>
+                    <ui-button-group>
+                        <ui-button text="{{ __('Deselect') }}" id="deselect-all" />
+                        <ui-button type="submit" variant="primary" text="{{ __('Submit Selected to IndexNow') }}" id="submit-btn" :disabled="true" />
+                    </ui-button-group>
                 </div>
             </div>
         </form>
@@ -159,6 +165,63 @@
 @endsection
 
 @section('scripts')
+    {{-- Not in the content section either: the Vue template compiler strips <style> tags too --}}
+    <style>
+        .indexnow-toolbar {
+            position: sticky;
+            inset-block-end: 1.5rem;
+            z-index: var(--z-index-above, 10);
+            margin-block-start: 1rem;
+            pointer-events: none;
+        }
+
+        .indexnow-toolbar-inner {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            inline-size: fit-content;
+            margin-inline: auto;
+            padding-block: 0.25rem;
+            padding-inline: 0.75rem 0.25rem;
+            border: 1px solid oklch(0.87 0.006 286 / 0.6);
+            border-radius: 0.75rem;
+            background: oklch(0.92 0.004 286 / 0.85);
+            box-shadow: 0 1px 16px -2px oklch(0.37 0.013 286 / 0.2);
+            backdrop-filter: blur(8px);
+            pointer-events: auto;
+        }
+
+        .indexnow-toolbar-count {
+            font-size: 0.875rem;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            color: oklch(0.44 0.016 286);
+        }
+
+        .dark .indexnow-toolbar-inner {
+            border-color: oklch(0.37 0.013 286);
+            background: oklch(0.27 0.006 286 / 0.9);
+            box-shadow: 0 10px 15px oklch(0 0 none / 0.5);
+        }
+
+        .dark .indexnow-toolbar-count {
+            color: oklch(0.71 0.014 286);
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .indexnow-toolbar {
+                transition: translate 0.2s ease-out, opacity 0.2s ease-out;
+            }
+
+            @starting-style {
+                .indexnow-toolbar {
+                    translate: 0 100%;
+                    opacity: 0;
+                }
+            }
+        }
+    </style>
+
     {{--
         Kept outside of the content section: on Statamic 6 the content is compiled as a Vue
         template, which strips <script> tags and replaces the server-rendered DOM on mount.
@@ -193,6 +256,11 @@
                 var selectAll = document.getElementById('select-all');
                 var submitBtn = getSubmitButton();
                 var countLabel = document.getElementById('selected-count');
+                var toolbar = document.getElementById('indexnow-toolbar');
+
+                if (toolbar) {
+                    toolbar.hidden = checked.length === 0;
+                }
 
                 if (submitBtn) {
                     submitBtn.disabled = checked.length === 0;
@@ -264,6 +332,11 @@
                 updateState();
             }
 
+            function clearSelection() {
+                getCheckboxes().forEach(function (cb) { cb.checked = false; });
+                updateState();
+            }
+
             document.addEventListener('change', function (e) {
                 if (e.target.id === 'select-all') {
                     getCheckboxes().forEach(function (cb) { cb.checked = e.target.checked; });
@@ -299,7 +372,27 @@
                 } else if (target.closest('#select-modified')) {
                     e.preventDefault();
                     selectByStatus('modified');
+                } else if (target.closest('#deselect-all')) {
+                    e.preventDefault();
+                    clearSelection();
                 }
+            });
+
+            // Escape deselects, like the CP listing toolbar, unless focus is in a form control
+            document.addEventListener('keydown', function (e) {
+                var toolbar = document.getElementById('indexnow-toolbar');
+                var tag = e.target instanceof Element ? e.target.tagName : '';
+
+                if (e.key !== 'Escape' || ! toolbar || toolbar.hidden) {
+                    return;
+                }
+
+                if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.querySelector('[role="dialog"]')) {
+                    return;
+                }
+
+                e.preventDefault();
+                clearSelection();
             });
 
             document.addEventListener('submit', function (e) {
