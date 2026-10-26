@@ -6,12 +6,17 @@ Submit URLs to [IndexNow](https://www.indexnow.org/) directly from your Statamic
 
 [IndexNow](https://www.indexnow.org/) is an open protocol that allows websites to instantly notify search engines about content changes. Instead of waiting for search engines to discover updates through crawling, IndexNow enables real-time notifications resulting in faster indexing and more current search results.
 
-When you submit to any one participating search engine, the submission is automatically shared with all others:
+When you submit to any one participating search engine, the submission is shared with all other IndexNow-enabled engines. [indexnow.org](https://www.indexnow.org/searchengines.json) currently lists these participants:
 
 - **Bing**
 - **Yandex**
 - **Seznam**
 - **Naver**
+- **Yep**
+- **Amazon** (Amazonbot)
+- **Internet Archive**
+
+Each engine decides on its own whether and when to crawl and index a submitted URL. Submitting a URL does not guarantee that it gets indexed.
 
 > **Note:** Google does not participate in IndexNow. Use [Google Search Console](https://search.google.com/search-console) for Google indexing.
 
@@ -43,7 +48,7 @@ No database required. Submission history is stored as a JSON file in `storage/st
 
 ### 1. Generate an IndexNow key
 
-Your API key must be 8-128 characters long, using alphanumeric characters and hyphens. You can generate one at [indexnow.org/genkey](https://www.indexnow.org/genkey) or use OpenSSL:
+Your API key must be 8-128 characters long and may only contain lowercase letters (`a-z`), uppercase letters (`A-Z`), numbers (`0-9`) and dashes (`-`). You can generate one at [indexnow.org/genkey](https://www.indexnow.org/genkey) or use OpenSSL:
 
 ```bash
 openssl rand -hex 32
@@ -55,15 +60,22 @@ openssl rand -hex 32
 INDEXNOW_KEY=your-key-here
 ```
 
+IndexNow says only you and the search engines should know the key, so keep it out of version control.
+
 ### 3. Host the verification key file
 
-IndexNow requires a verification file at your domain root to prove ownership. Create a text file named `{your-key}.txt` containing just the key:
+To prove you own the host, IndexNow requires a UTF-8 encoded text file named `{your-key}.txt` at the root of your production domain. The file contains only the key. In a typical Statamic install you place it in the `public/` directory so it's served at:
 
 ```
 https://yourdomain.com/your-key-here.txt
 ```
 
-The file must be publicly accessible and return only the key as plain text.
+The file must be publicly accessible. Search engines fetch it to verify your submissions and keep using the key until you change it. Submissions send this root location as `keyLocation`. IndexNow also lets you host the key file elsewhere, but this addon only uses the root location (the option IndexNow recommends).
+
+A few things to keep in mind:
+
+- **One host per key file.** Every submitted URL must belong to the host of your production URL. Each subdomain (for example `www.` vs. bare domain, or `blog.`) counts as a separate host and needs its own key file.
+- **Rotating the key.** To rotate, generate a new key, replace the key file, and update `INDEXNOW_KEY`. Search engines re-verify the new key on their own.
 
 That's it! Head to **CP > Utilities > IndexNow** and start submitting.
 
@@ -107,6 +119,12 @@ If you manage your site from a development or staging environment, set `INDEXNOW
 INDEXNOW_PRODUCTION_URL=https://yourdomain.com
 ```
 
+The host of this URL is sent as the `host` of each submission, and the key file must be reachable at `{production_url}/{key}.txt`. Use the exact host your site is served on (including or excluding `www.`). If you don't, IndexNow rejects the submission because the URLs don't belong to the host.
+
+### Endpoint
+
+By default, submissions go to the global endpoint `https://api.indexnow.org/indexnow`. You can send them to a specific search engine's endpoint instead (for example `https://www.bing.com/indexnow`). The submission is still shared with all participating engines either way.
+
 ### Excluding collections
 
 Add collection handles to `exclude_collections` to hide them from the utility and skip them during auto-submission:
@@ -139,7 +157,26 @@ Enable automatic submission whenever entries are saved:
 INDEXNOW_AUTO_SUBMIT=true
 ```
 
-When enabled, each published entry triggers a submission to IndexNow. Entries in excluded collections and unpublished entries are skipped.
+When enabled, every save of a published entry triggers a submission to IndexNow. Entries in excluded collections, entries without a URL, and unpublished entries are skipped.
+
+IndexNow asks you not to resubmit unchanged URLs, and not to submit the same URL many times a day unless its content changed meaningfully. Every submitted URL counts toward your site's crawl quota, and submitting too often can get you rate-limited (HTTP 429). Auto-submit doesn't throttle repeated saves, so if your editors save the same entry often, consider leaving auto-submit off and submitting from the utility instead.
+
+> **Note:** IndexNow also accepts URLs that were deleted (returning 404/410) or redirected. This addon currently only submits published entries. Unpublishing or deleting an entry does not trigger a submission.
+
+### Response codes
+
+The addon records the HTTP status of every submission. These are the status codes IndexNow defines:
+
+| Code | Meaning |
+|---|---|
+| `200 OK` | URLs submitted successfully. This only means the search engine received them, not that they will be indexed. |
+| `202 Accepted` | URLs received, but key validation is still pending. |
+| `400 Bad Request` | Invalid request format. |
+| `403 Forbidden` | Key not valid (e.g. key not found, or the file was found but the key isn't in it). |
+| `422 Unprocessable Entity` | URLs don't belong to the host, or the key doesn't match the protocol schema. |
+| `429 Too Many Requests` | Too many requests (potential spam). |
+
+The utility treats any `2xx` response as a successful submission. For other responses, it shows the error returned by the endpoint. Check your key, key file and production URL, avoid submitting too often, and then resubmit.
 
 ### Cleaning up old records
 
