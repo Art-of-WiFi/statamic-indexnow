@@ -139,6 +139,8 @@ Add collection handles to `exclude_collections` to hide them from the utility an
 
 Navigate to **Utilities > IndexNow** in the Control Panel. You'll see all published entries with their submission status:
 
+![IndexNow utility in the Statamic Control Panel](docs/cp-utility.png)
+
 | Status | Meaning |
 |---|---|
 | **Never** (gray) | Entry has never been submitted to IndexNow |
