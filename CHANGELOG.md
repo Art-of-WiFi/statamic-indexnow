@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## Unreleased
+## 1.3.0 - 2026-10-26
 
 - Fixed page selection and submission in the IndexNow utility on Statamic 6, where the inline script was stripped by the Vue-rendered Control Panel (#2)
 - Changed the IndexNow utility's submit button to a floating toolbar that appears while entries are selected, like the Control Panel listings; Escape deselects
