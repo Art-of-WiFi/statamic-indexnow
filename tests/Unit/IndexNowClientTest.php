@@ -67,6 +67,31 @@ class IndexNowClientTest extends TestCase
         $this->assertStringContainsString('429', $result['errors'][0]);
     }
 
+    public function test_failed_submissions_do_not_count_as_last_submitted(): void
+    {
+        Http::fake([
+            'api.indexnow.org/*' => Http::sequence()
+                ->push('', 200)
+                ->push('Forbidden', 403)
+                ->push('Forbidden', 403),
+        ]);
+
+        $client = app(IndexNowClient::class);
+
+        $this->travelTo(now()->subHour());
+        $client->submitSingle('entry-1', 'https://example.com/page-one');
+        $successfulAt = now()->toIso8601String();
+        $this->travelBack();
+
+        $client->submitSingle('entry-1', 'https://example.com/page-one');
+        $client->submitSingle('entry-2', 'https://example.com/page-two');
+
+        $lastSubmitted = app(SubmissionStore::class)->lastSubmittedPerEntry();
+
+        $this->assertSame($successfulAt, $lastSubmitted->get('entry-1'));
+        $this->assertFalse($lastSubmitted->has('entry-2'));
+    }
+
     public function test_submit_chunks_large_batches(): void
     {
         config(['statamic-indexnow.batch_size' => 2]);

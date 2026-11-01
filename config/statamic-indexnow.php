@@ -21,7 +21,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | The IndexNow endpoint to submit URLs to. Any participating engine will
-    | share submissions with all others (Bing, Yandex, Seznam, Naver).
+    | share submissions with all others (Bing, Yandex, Seznam, Naver, Yep,
+    | Amazon, Internet Archive).
     |
     */
 

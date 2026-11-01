@@ -39,13 +39,14 @@ class SubmissionStore
     }
 
     /**
-     * Get the last submission timestamp per entry ID.
+     * Get the last successful (2xx) submission timestamp per entry ID.
      *
      * @return Collection<string, string>
      */
     public function lastSubmittedPerEntry(): Collection
     {
         return $this->all()
+            ->filter(fn (array $record) => $record['status_code'] >= 200 && $record['status_code'] < 300)
             ->groupBy('entry_id')
             ->map(fn (Collection $records) => $records->max('submitted_at'));
     }
