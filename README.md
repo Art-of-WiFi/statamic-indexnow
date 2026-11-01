@@ -48,7 +48,7 @@ No database required. Submission history is stored as a JSON file in `storage/st
 
 ### 1. Generate an IndexNow key
 
-Your API key must be 8-128 characters long and may only contain lowercase letters (`a-z`), uppercase letters (`A-Z`), numbers (`0-9`) and dashes (`-`). You can generate one at [indexnow.org/genkey](https://www.indexnow.org/genkey) or use OpenSSL:
+Your API key must be 8-128 characters long and may only contain lowercase letters (`a-z`), uppercase letters (`A-Z`), numbers (`0-9`) and dashes (`-`). You can generate one using OpenSSL like so:
 
 ```bash
 openssl rand -hex 32
