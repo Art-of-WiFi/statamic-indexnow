@@ -12,9 +12,7 @@ class PruneSubmissionsTest extends TestCase
     {
         parent::setUp();
 
-        $store = app(SubmissionStore::class);
-
-        // Seed with test data via reflection to write directly
+        // Seed the store by writing its JSON file directly
         $path = storage_path('statamic-indexnow/submissions.json');
         File::ensureDirectoryExists(dirname($path));
         File::put($path, json_encode([
@@ -33,17 +31,6 @@ class PruneSubmissionsTest extends TestCase
                 'submitted_at' => now()->subDays(10)->toIso8601String(),
             ],
         ]));
-    }
-
-    protected function tearDown(): void
-    {
-        $path = storage_path('statamic-indexnow');
-
-        if (File::isDirectory($path)) {
-            File::deleteDirectory($path);
-        }
-
-        parent::tearDown();
     }
 
     public function test_prune_deletes_old_records(): void

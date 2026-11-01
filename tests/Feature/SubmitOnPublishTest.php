@@ -6,6 +6,7 @@ use ArtOfWifi\StatamicIndexnow\IndexNowClient;
 use ArtOfWifi\StatamicIndexnow\Listeners\SubmitOnPublish;
 use ArtOfWifi\StatamicIndexnow\Tests\TestCase;
 use Mockery;
+use Mockery\MockInterface;
 use Statamic\Events\EntrySaved;
 
 class SubmitOnPublishTest extends TestCase
@@ -14,11 +15,10 @@ class SubmitOnPublishTest extends TestCase
     {
         config(['statamic-indexnow.auto_submit' => true]);
 
-        $entry = Mockery::mock();
+        $entry = $this->mockEntry();
         $entry->shouldReceive('published')->andReturn(true);
         $entry->shouldReceive('collectionHandle')->andReturn('pages');
         $entry->shouldReceive('uri')->andReturn('/test-page');
-        $entry->shouldReceive('id')->andReturn('test-entry-id');
 
         $client = Mockery::mock(IndexNowClient::class);
         $client->shouldReceive('buildProductionUrl')
@@ -39,7 +39,7 @@ class SubmitOnPublishTest extends TestCase
     {
         config(['statamic-indexnow.auto_submit' => false]);
 
-        $entry = Mockery::mock();
+        $entry = $this->mockEntry();
         $entry->shouldNotReceive('published');
 
         $client = Mockery::mock(IndexNowClient::class);
@@ -59,7 +59,7 @@ class SubmitOnPublishTest extends TestCase
             'statamic-indexnow.key' => null,
         ]);
 
-        $entry = Mockery::mock();
+        $entry = $this->mockEntry();
         $entry->shouldNotReceive('published');
 
         $client = Mockery::mock(IndexNowClient::class);
@@ -76,7 +76,7 @@ class SubmitOnPublishTest extends TestCase
     {
         config(['statamic-indexnow.auto_submit' => true]);
 
-        $entry = Mockery::mock();
+        $entry = $this->mockEntry();
         $entry->shouldReceive('published')->andReturn(false);
 
         $client = Mockery::mock(IndexNowClient::class);
@@ -96,7 +96,7 @@ class SubmitOnPublishTest extends TestCase
             'statamic-indexnow.exclude_collections' => ['internal'],
         ]);
 
-        $entry = Mockery::mock();
+        $entry = $this->mockEntry();
         $entry->shouldReceive('published')->andReturn(true);
         $entry->shouldReceive('collectionHandle')->andReturn('internal');
 
@@ -114,7 +114,7 @@ class SubmitOnPublishTest extends TestCase
     {
         config(['statamic-indexnow.auto_submit' => true]);
 
-        $entry = Mockery::mock();
+        $entry = $this->mockEntry();
         $entry->shouldReceive('published')->andReturn(true);
         $entry->shouldReceive('collectionHandle')->andReturn('pages');
         $entry->shouldReceive('uri')->andReturn(null);
@@ -127,5 +127,17 @@ class SubmitOnPublishTest extends TestCase
         $event = new EntrySaved($entry);
         $listener = new SubmitOnPublish;
         $listener->handle($event);
+    }
+
+    /**
+     * EntrySaved's constructor resolves the event initiator via $entry->root()->id().
+     */
+    protected function mockEntry(): MockInterface
+    {
+        $entry = Mockery::mock();
+        $entry->shouldReceive('root')->andReturnSelf();
+        $entry->shouldReceive('id')->andReturn('test-entry-id');
+
+        return $entry;
     }
 }

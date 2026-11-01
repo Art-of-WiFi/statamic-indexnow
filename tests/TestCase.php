@@ -3,26 +3,25 @@
 namespace ArtOfWifi\StatamicIndexnow\Tests;
 
 use ArtOfWifi\StatamicIndexnow\ServiceProvider;
-use Orchestra\Testbench\TestCase as OrchestraTestCase;
-use Statamic\Extend\Manifest;
-use Statamic\Providers\StatamicServiceProvider;
-use Statamic\Statamic;
+use Illuminate\Support\Facades\File;
+use Statamic\Testing\AddonTestCase;
 
-abstract class TestCase extends OrchestraTestCase
+abstract class TestCase extends AddonTestCase
 {
-    protected function getPackageProviders($app): array
+    protected string $addonServiceProvider = ServiceProvider::class;
+
+    protected function setUp(): void
     {
-        return [
-            StatamicServiceProvider::class,
-            ServiceProvider::class,
-        ];
+        parent::setUp();
+
+        $this->deleteSubmissionStore();
     }
 
-    protected function getPackageAliases($app): array
+    protected function tearDown(): void
     {
-        return [
-            'Statamic' => Statamic::class,
-        ];
+        $this->deleteSubmissionStore();
+
+        parent::tearDown();
     }
 
     protected function defineEnvironment($app): void
@@ -30,38 +29,10 @@ abstract class TestCase extends OrchestraTestCase
         $app['config']->set('statamic-indexnow.key', 'test-key-12345678');
         $app['config']->set('statamic-indexnow.production_url', 'https://example.com');
         $app['config']->set('statamic-indexnow.endpoint', 'https://api.indexnow.org/indexnow');
-        $app['config']->set('statamic.users.repository', 'file');
-        $app['config']->set('statamic.stache.stores.users', [
-            'class' => \Statamic\Stache\Stores\UsersStore::class,
-            'directory' => __DIR__ . '/__fixtures__/users',
-        ]);
     }
 
-    protected function setUp(): void
+    protected function deleteSubmissionStore(): void
     {
-        parent::setUp();
-
-        // Mock the addon manifest so Statamic recognizes our addon
-        $this->app->instance(Manifest::class, new class extends Manifest
-        {
-            public function build(): void
-            {
-                $this->manifest = [
-                    'artofwifi/statamic-indexnow' => [
-                        'id' => 'artofwifi/statamic-indexnow',
-                        'namespace' => 'ArtOfWifi\\StatamicIndexnow',
-                    ],
-                ];
-            }
-
-            public function manifest(): array
-            {
-                if (! $this->manifest) {
-                    $this->build();
-                }
-
-                return $this->manifest;
-            }
-        });
+        File::deleteDirectory(storage_path('statamic-indexnow'));
     }
 }
