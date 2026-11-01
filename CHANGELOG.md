@@ -2,6 +2,11 @@
 
 All notable changes to this package will be documented in this file.
 
+## 1.3.1 - 2026-11-01
+
+- Fixed entries being marked as submitted after a failed submission (e.g. `403` or `429`); only `2xx` responses now count towards an entry's status, while failed attempts are still recorded
+- Fixed the test suite, which failed to boot on current Laravel/Statamic versions
+
 ## 1.3.0 - 2026-10-26
 
 - Fixed page selection and submission in the IndexNow utility on Statamic 6, where the inline script was stripped by the Vue-rendered Control Panel (#2)
