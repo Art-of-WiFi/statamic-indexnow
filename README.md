@@ -143,9 +143,11 @@ Navigate to **Utilities > IndexNow** in the Control Panel. You'll see all publis
 
 | Status | Meaning |
 |---|---|
-| **Never** (gray) | Entry has never been submitted to IndexNow |
-| **Modified** (amber) | Entry was modified after the last submission |
-| **Submitted** (green) | Entry hasn't changed since last submission |
+| **Never** (gray) | Entry has never been successfully submitted to IndexNow |
+| **Modified** (amber) | Entry was modified after the last successful submission |
+| **Submitted** (green) | Entry hasn't changed since the last successful submission |
+
+Only submissions that got a `2xx` response count. Failed submissions (e.g. `403` or `429`) are still recorded, but they don't change an entry's status.
 
 Select entries and click **Submit Selected to IndexNow**. Use the quick-select buttons to select all unsubmitted or modified entries.
 
